@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#101713"><meta name="description" content="Seu controle financeiro pessoal.">
+<link rel="manifest" href="manifest.json"><link rel="icon" href="icon.svg" type="image/svg+xml">
+<title>Meu Financeiro</title>
+<style>
+:root{color-scheme:dark;--bg:#101713;--panel:#1a2520;--panel2:#203329;--line:#304238;--muted:#9aafa1;--green:#80dfa0;--red:#f29b9b;--text:#f2f7f3}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:15px system-ui,-apple-system,Segoe UI,sans-serif;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}
+.app{max-width:720px;margin:auto;padding:20px 16px 100px}.top{display:flex;align-items:center;gap:12px;margin:4px 0 22px}.logo{width:44px;height:44px;border-radius:14px;background:#24543d;display:grid;place-items:center;font-size:23px}.brand{font-weight:750;font-size:19px}.sub,.muted{color:var(--muted);font-size:12px}.avatar{margin-left:auto;color:var(--muted)}
+.balance{background:linear-gradient(135deg,#1d4430,#193326);border:1px solid #365743;border-radius:22px;padding:20px;margin-bottom:16px}.eyebrow{font-size:11px;letter-spacing:1px;color:#c0d8c8}.amount{font-size:34px;font-weight:750;margin:5px 0 18px;letter-spacing:-1px}.stats{display:grid;grid-template-columns:1fr 1fr;gap:12px}.stat{border-top:1px solid #496451;padding-top:12px}.stat span{display:block;color:#c0d8c8;font-size:12px}.stat b{font-size:17px}.green{color:var(--green)}.red{color:var(--red)}
+.actions{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:14px 0 20px}.action{border:1px solid var(--line);background:var(--panel);color:var(--text);border-radius:15px;padding:14px;text-align:left;font:inherit}.action strong{display:block;margin-top:7px}.section{display:flex;justify-content:space-between;align-items:center;margin:22px 0 10px}.section h2{font-size:16px;margin:0}.card{background:var(--panel);border:1px solid var(--line);border-radius:17px;padding:15px;margin-bottom:10px}.row{display:flex;align-items:center;justify-content:space-between;gap:10px}.item{padding:12px 0;border-bottom:1px solid var(--line)}.item:last-child{border:0}.small{font-size:12px;color:var(--muted)}button{cursor:pointer}.tabs{position:fixed;bottom:0;left:0;right:0;background:#141e18f5;border-top:1px solid var(--line);display:flex;justify-content:center;padding:9px 8px calc(9px + env(safe-area-inset-bottom));backdrop-filter:blur(12px);z-index:5}.tabs button{flex:1;max-width:150px;background:none;border:0;color:var(--muted);padding:7px 2px;font-size:11px}.tabs button.active{color:var(--green)}.tabs span{display:block;font-size:19px;margin-bottom:2px}
+input,select{width:100%;background:#111a15;border:1px solid var(--line);border-radius:11px;padding:12px;color:var(--text);font:inherit;margin:5px 0 10px}label{font-size:12px;color:var(--muted)}.primary{background:#286342;color:white;border:0;border-radius:12px;padding:12px 16px;font:600 14px system-ui;width:100%;margin-top:5px}.secondary{background:#26362d;border:1px solid var(--line);color:var(--text);border-radius:10px;padding:8px 12px}.danger{color:var(--red)}.empty{text-align:center;color:var(--muted);padding:22px 8px;font-size:13px}.progress{height:8px;background:#34443a;border-radius:20px;overflow:hidden;margin:10px 0}.progress i{display:block;height:100%;background:var(--green);border-radius:20px}.hidden{display:none}.chart{width:100%;height:190px}.pill{font-size:11px;border-radius:20px;padding:4px 8px;background:#26382d;color:var(--green)}
+</style>
+</head>
+<body><main class="app">
+<header class="top"><div class="logo">◈</div><div><div class="brand">Meu Financeiro</div><div class="sub">Sua vida financeira sob controle</div></div><div class="avatar">●</div></header>
+<section id="home">
+<div class="balance"><div class="eyebrow">SALDO ATUAL</div><div class="amount" id="balance">R$ 0,00</div><div class="stats"><div class="stat"><span>↙ Entradas</span><b class="green" id="income">R$ 0,00</b></div><div class="stat"><span>↗ Saídas</span><b class="red" id="expenses">R$ 0,00</b></div></div></div>
+<div class="actions"><button class="action" onclick="openForm('Entrada')">＋ <strong>Adicionar entrada</strong><small class="muted">Dinheiro recebido</small></button><button class="action" onclick="openForm('Saída')">－ <strong>Adicionar saída</strong><small class="muted">Dinheiro gasto</small></button></div>
+<div class="section"><h2>Movimentações recentes</h2><span class="small" id="count">0 registros</span></div><div class="card" id="recent"></div>
+<div class="section"><h2>Visão do mês</h2><span class="pill">Resumo</span></div><div class="card"><canvas id="homeChart" class="chart"></canvas></div>
+</section>
+<section id="transactions" class="hidden"><div class="section"><h2>Movimentações</h2><button class="secondary" onclick="openForm('Entrada')">＋ Novo</button></div><div id="allTransactions" class="card"></div></section>
+<section id="goals" class="hidden"><div class="section"><h2>Metas de economia</h2><button class="secondary" onclick="goalForm()">＋ Nova meta</button></div><div id="goalList"></div></section>
+<section id="debts" class="hidden"><div class="section"><h2>Minhas dívidas</h2><button class="secondary" onclick="debtForm()">＋ Nova</button></div><div id="debtList"></div></section>
+<section id="reports" class="hidden"><div class="section"><h2>Gráficos e relatórios</h2></div><div class="card"><div class="small">Entradas x saídas</div><canvas id="reportChart" class="chart"></canvas></div><div class="card" id="reportText"></div></section>
+</main>
+<nav class="tabs"><button class="active" data-tab="home"><span>⌂</span>Início</button><button data-tab="transactions"><span>⇄</span>Movimentos</button><button data-tab="goals"><span>◎</span>Metas</button><button data-tab="debts"><span>▤</span>Dívidas</button><button data-tab="reports"><span>▥</span>Relatórios</button></nav>
+<script>
+const $=id=>document.getElementById(id), money=n=>n.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+let data=JSON.parse(localStorage.getItem('mf-data')||'{"tx":[],"goals":[],"debts":[]}');
+function save(){localStorage.setItem('mf-data',JSON.stringify(data));render()}
+function sums(){let inc=data.tx.filter(x=>x.type==='Entrada').reduce((a,x)=>a+x.value,0),out=data.tx.filter(x=>x.type==='Saída').reduce((a,x)=>a+x.value,0);return {inc,out}}
+function render(){let {inc,out}=sums();$('balance').textContent=money(inc-out);$('income').textContent=money(inc);$('expenses').textContent=money(out);$('count').textContent=data.tx.length+' registros';
+let txhtml=data.tx.slice().reverse().map(x=>`<div class="item row"><div><b>${esc(x.desc)}</b><div class="small">${x.date} · ${x.type}</div></div><b class="${x.type==='Entrada'?'green':'red'}">${x.type==='Entrada'?'+':'−'} ${money(x.value)}</b></div>`).join('')||'<div class="empty">Suas movimentações aparecerão aqui.</div>';
+$('recent').innerHTML=txhtml;$('allTransactions').innerHTML=txhtml;
+$('goalList').innerHTML=data.goals.map((g,i)=>`<div class="card"><div class="row"><b>${esc(g.name)}</b><button class="secondary" onclick="addGoal(${i})">＋ Guardar</button></div><div class="row"><span class="small">${money(g.saved)} de ${money(g.target)}</span><b>${Math.min(100,g.saved/g.target*100).toFixed(0)}%</b></div><div class="progress"><i style="width:${Math.min(100,g.saved/g.target*100)}%"></i></div></div>`).join('')||'<div class="card empty">Crie uma meta para acompanhar seu progresso.</div>';
+$('debtList').innerHTML=data.debts.map((d,i)=>`<div class="card row"><div><b>${esc(d.name)}</b><div class="small">Valor pendente</div><b class="red">${money(d.value)}</b></div><button class="secondary" onclick="removeDebt(${i})">Quitar</button></div>`).join('')||'<div class="card empty">Nenhuma dívida cadastrada.</div>';
+$('reportText').innerHTML=`<div class="row"><span>Entradas</span><b class="green">${money(inc)}</b></div><div class="item row"><span>Saídas</span><b class="red">${money(out)}</b></div><div class="row"><b>Resultado</b><b>${money(inc-out)}</b></div>`;
+draw('homeChart',inc,out);draw('reportChart',inc,out)}
+function esc(s){return s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function openForm(type){let desc=prompt('Descrição da '+type.toLowerCase()+':');if(!desc)return;let v=Number(prompt('Valor em reais (ex.: 35,50):','').replace(',','.'));if(!Number.isFinite(v)||v<=0)return alert('Informe um valor válido.');data.tx.push({desc,type,value:v,date:new Date().toLocaleDateString('pt-BR')});save()}
+function goalForm(){let name=prompt('Nome da meta:');if(!name)return;let target=Number(prompt('Valor total da meta:','').replace(',','.'));if(target>0){data.goals.push({name,target,saved:0});save()}}
+function addGoal(i){let v=Number(prompt('Quanto deseja adicionar à meta?','').replace(',','.'));if(v>0){data.goals[i].saved+=v;save()}}
+function debtForm(){let name=prompt('Nome da dívida:');if(!name)return;let value=Number(prompt('Valor da dívida:','').replace(',','.'));if(value>0){data.debts.push({name,value});save()}}
+function removeDebt(i){if(confirm('Marcar esta dívida como quitada?')){data.debts.splice(i,1);save()}}
+function draw(id,a,b){let c=$(id),ctx=c.getContext('2d'),w=c.clientWidth,dpr=devicePixelRatio||1;c.width=w*dpr;c.height=190*dpr;ctx.scale(dpr,dpr);ctx.clearRect(0,0,w,190);let max=Math.max(a,b,1),base=155,barW=Math.min(70,w*.2);[[a,'#80dfa0',w*.32,'Entradas'],[b,'#f29b9b',w*.68,'Saídas']].forEach(([v,col,x,label])=>{let h=v/max*110;ctx.fillStyle=col;ctx.beginPath();ctx.roundRect(x-barW/2,base-h,barW,h,7);ctx.fill();ctx.fillStyle='#dce9df';ctx.font='12px system-ui';ctx.textAlign='center';ctx.fillText(label,x,178);ctx.fillStyle='#9aafa1';ctx.fillText(money(v),x,base-h-9)})}
+document.querySelectorAll('.tabs button').forEach(b=>b.addEventListener('click',()=>{document.querySelectorAll('.tabs button').forEach(x=>x.classList.toggle('active',x===b));['home','transactions','goals','debts','reports'].forEach(id=>$(id).classList.toggle('hidden',id!==b.dataset.tab));render()}));
+if('serviceWorker'in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));
+render();
+</script></body></html>
